@@ -3,7 +3,9 @@ const Redis = require('ioredis');
 require('dotenv').config();
 
 const redis = new Redis(process.env.REDIS_URL);
+console.log('Connected to redis');
 const pool = mysql.createPool(process.env.DATABASE_URL);
+console.log('Connected to mysql');
 
 const { calculateExpirationDate } = require('../helper/expireDateCalculator');
 
