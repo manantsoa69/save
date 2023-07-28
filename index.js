@@ -32,7 +32,7 @@ const QueryResultModel = mongoose.model('QueryResult', queryResultSchema);
 // Redis Setup
 const redisUrl = process.env.UPSTASH_RED || '';
 const redisClient = new Redis(redisUrl);
-redisClient.on('connect', () => console.log('Connected to Redis'));
+redisClient.on('connect', () => console.log('Connected to upstash'));
 redisClient.on('error', error => console.error('Error connecting to Redis:', error));
 
 // Express Configuration
