@@ -22,5 +22,8 @@
     "mongoose": "^7.4.0",
     "mysql2": "^3.5.2",
     "socket.io": "^4.7.1"
+   },
+  "engines": {
+    "node": ">=18"
   }
 }
