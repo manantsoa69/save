@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Interface</title>
+  <link rel="stylesheet" type="text/css" href="admin.css">
+</head>
+<body>
+  <h1>Admin Interface</h1>
+  <form id="subscribeForm">
+    <div>
+      <label for="fbid">FBID</label>
+      <input type="text" id="fbid" name="fbid" required>
+    </div>
+
+    <div>
+      <label for="subscriptionStatus">Subscription Status:</label>
+      <select id="subscriptionStatus" name="subscriptionStatus" required>
+        <option value="10M">10M</option>
+        <option value="1D">1D</option>
+        <option value="1M">1M</option>
+        <option value="3M">3M</option>
+        <option value="6M">6M</option>
+        <option value="1Y">1Y</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="button-container">
+        <div class="left-button">
+          <button type="submit">Subscribe</button>
+        </div>
+        
+        <div class="right-button">
+          <button type="button" onclick="sendMessage()">Thank You</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div id="message"></div>
+
+  <h2>Query Form</h2>
+
+  <form id="queryForm" method="GET">
+    <label for="number">Number to Query:</label>
+    <input type="text" id="number" name="number" required>
+    <button type="submit">Query</button>
+  </form>
+
+  <div id="query-results"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const fbidInput = document.getElementById('fbid');
+    const subscriptionStatusInput = document.getElementById('subscriptionStatus');
+    const messageElement = document.getElementById('message');
+
+    document.getElementById('subscribeForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const fbid = fbidInput.value;
+      const subscriptionStatus = subscriptionStatusInput.value;
+
+      const payload = { fbid, subscriptionStatus };
+
+      axios.post('/subscribe', payload)
+        .then((response) => response.data)
+        .then(handleResponse)
+        .catch(handleError);
+    });
+
+    function handleResponse(data) {
+      console.log(data);
+      const isSuccess = data.success;
+      const message = data.message;
+
+      messageElement.innerText = message;
+      messageElement.style.color = isSuccess ? 'green' : 'red';
+      fbidInput.value = '';
+
+      setTimeout(() => {
+        messageElement.innerText = '';
+        messageElement.style.color = '';
+      }, 3000);
+    }
+
+    document.getElementById('queryForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const number = document.getElementById('number').value;
+
+      axios.get('/query', { params: { number } })
+        .then((response) => response.data)
+        .then(handleQueryResponse)
+        .catch(handleError);
+    });
+
+    function handleQueryResponse(data) {
+      const numberToQuery = data.numberToQuery;
+      const items = data.items;
+
+      let html = '';
+      if (items.length > 0) {
+        html += '<h3>Query Results:</h3>';
+        html += '<table>';
+        html += '<thead><tr>';
+        Object.keys(items[0]).forEach((key) => {
+          html += `<th>${key}</th>`;
+        });
+        html += '</tr></thead>';
+        html += '<tbody>';
+        items.forEach((item) => {
+          html += '<tr>';
+          Object.values(item).forEach((value) => {
+            html += `<td>${value}</td>`;
+          });
+          html += '</tr>';
+        });
+        html += '</tbody>';
+        html += '</table>';
+
+        const fbidValue = items[0].fbid;
+        fbidInput.value = fbidValue;
+      } else {
+        html += '<p>No matching item found.</p>';
+      }
+
+      const queryResultsElement = document.getElementById('query-results');
+      queryResultsElement.innerHTML = html;
+
+      setTimeout(() => {
+        document.getElementById('number').value = '';
+      }, 9000);
+    }
+
+    function handleError(error) {
+      console.error('Error:', error);
+      messageElement.innerText = 'An error occurred';
+      messageElement.style.color = 'red';
+    }
+
+    function sendMessage() {
+      const fbid = fbidInput.value;
+
+      if (!fbid) {
+        messageElement.innerText = 'Please enter an FBID';
+        messageElement.style.color = 'red';
+        return;
+      }
+
+      messageElement.innerText = 'Sending message...';
+      messageElement.style.color = 'blue';
+
+      const payload = {
+        fbid
+      };
+
+      axios.post('/send_message', payload)
+        .then(response => {
+          const responseData = response.data;
+          messageElement.innerText = responseData.message;
+          messageElement.style.color = responseData.success ? 'green' : 'red';
+          fbidInput.value = '';
+
+          setTimeout(() => {
+            messageElement.innerText = '';
+            messageElement.style.color = '';
+          }, 3000);
+        })
+        .catch(error => {
+          console.error('Error sending message:', error);
+          messageElement.innerText = 'An error occurred';
+          messageElement.style.color = 'red';
+        });
+    }
+  </script>
+</body>
+</html>
