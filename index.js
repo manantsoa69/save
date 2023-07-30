@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const Redis = require('ioredis');
 const dotenv = require('dotenv');
 dotenv.config();
-
+const { getStoredNumbers } = require('./redis');
 const subscribeRoute = require('./routes/subscribeRoute');
 const homeRoute = require('./routes/homeRoute');
 
