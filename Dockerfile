@@ -1,5 +1,5 @@
 # Use Node.js v14
-FROM node:18
+FROM node:20.11.1
 
 # Create app directory
 WORKDIR /usr/src/app
