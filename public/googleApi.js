@@ -51,7 +51,6 @@ const googlechat = async (chathistory, query, param) => {
     console.log(`GOOGLE`);
     const prompt = await generatePrompt  (chathistory, query, param);
 
-    console.log(prompt);
     const result = await model.generateContent(prompt);
     
 
