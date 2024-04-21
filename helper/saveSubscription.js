@@ -1,58 +1,42 @@
-const mysql = require('mysql2/promise');
 const Redis = require('ioredis');
+const { createClient } = require('@supabase/supabase-js');
+const { sendMessage } = require('./messengerApi');
 require('dotenv').config();
-// Connect to the second Redis account
-const redis = new Redis(process.env.REDIS_URL);
-console.log('Connected to Redis');
-// Connect to the second Redis account
-const redis1 = new Redis(process.env.REDIS_URL1);
-console.log('Connected to Redis 1');
-const pool = mysql.createPool(process.env.DATABASE_URL);
-console.log('Connected to mysql');
 
-const { calculateExpirationDate } = require('../helper/expireDateCalculator');
+const redis = new Redis(process.env.REDIS_URL_1);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_API_KEY);
 
-const saveSubscription = async (fbid, subscriptionStatus) => {
-  if (subscriptionStatus === 'A') {
-    console.log('Subscription is already active:', subscriptionStatus);
-    return true;
-  }
-  
-  const expireDate = calculateExpirationDate(subscriptionStatus);
-  if (!expireDate) {
-    return false;
-  }
-
+const saveSubscription = async (fbid) => {
+  const expireSeconds = 86400;//1J
   try {
-    console.log('Updating subscription expiration date in MySQL:', subscriptionStatus);
+    const exists = await redis.exists(fbid);
+    if (!exists) {
+      console.log(`FBID ${fbid} not found in Redis. Saving subscription...`);
+      const cacheKey = `${fbid}`;
+      await redis.multi()
+        .rpush(cacheKey, 'Chat')
+        .rpush(cacheKey, '')
+        .expire(cacheKey, expireSeconds)
+        .exec();
 
-    // Update the expiration date for expired subscriptions in MySQL
-    const connection = await pool.getConnection();
-    try {
-      await connection.query('UPDATE users SET expireDate = ? WHERE fbid = ?', [expireDate.toISOString(), fbid]);
-      console.log('Subscription expiration date updated in MySQL:', subscriptionStatus);   
-    } finally {
-      connection.release();
+      console.log(`saved successfully in Redis.`);
+    } else {
+      console.log(`FBID already exists in Redis.`);
     }
-
-    // Update the expiration date in Redis as well
-    const cacheKey = `${fbid}`;
-    const expireDateInSeconds = Math.ceil((new Date(expireDate) - new Date()) / 1000);
-    const updatePromises = [
-      redis.setex(cacheKey, expireDateInSeconds, expireDate.toISOString()),
-      redis1.setex(cacheKey, expireDateInSeconds, expireDate.toISOString())
-    ];
-
-    // Execute both updates simultaneously using Promise.all
-    await Promise.all(updatePromises);
-    console.log('Subscription expiration date updated in Redis:', subscriptionStatus);
-
-    return true;
+      // Save new subscription in Supabase
+    const expireDate = new Date(Date.now() + expireSeconds * 1000);
+      //const formattedExpireDate = expireDate.toISOString().slice(0, 16);
+    await supabase.from('chat_responses').insert([{ fbid: fbid, expireDate: expireDate }]);
+      // Send welcome message
+    await sendMessage(fbid, `🎉 Votre essai gratuit a été activé. ⏰\nVotre ID:'${fbid}'`);
+    console.log('Welcome message sent.');
+    return { status: 'New'};
+   
   } catch (error) {
-    console.error('Error occurred while updating subscription expiration date:', error);
-    return false;
+    console.error('Error:', error.message);
+    return { status: 'Error', message: error.message };
   }
-};
+}
 
 module.exports = {
   saveSubscription,
