@@ -13,7 +13,7 @@
   💰 Prix : 2 000 Ariary 
   🏧 Moyens de paiement acceptés :
   Artel Money:
-  033    (👤 Jean Marc.)
+  033 57 446 80      (👤 Jean Marc.)
   📲 Une fois le paiement effectué, veuillez nous fournir votre numéro (10 chiffres) pour la vérification.
   (Aza asina espace na soratra fa tonga dia ny numéro ihany)`;
   const msgE =`📢 Votre abonnement a expiré. 😢 Pour continuer à bénéficier des services de notre chatbot, nous vous encourageons à renouveler votre abonnement dès maintenant. L'abonnement est disponible à partir de 2500 Ariary seulement. Si vous avez besoin de plus de détails, n'hésitez pas à nous le demander ! 💬` 
