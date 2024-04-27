@@ -85,7 +85,7 @@
           } else {
             console.log(`No data found in table chat_responses with fbid '${fbid}'`);
             await Promise.all([
-                sendMessage(fbid, welcomeMsg),
+                //sendMessage(fbid, welcomeMsg),
                 yesNo(fbid),
               ]);
             return 1;
