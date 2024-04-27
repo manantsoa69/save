@@ -61,7 +61,7 @@ const googlechat = async (chathistory, query, param) => {
       return await handleFallback(prompt);
     }
 
-    return { content };
+    return  content ;
 
   } catch (googleError) {
 
