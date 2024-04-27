@@ -83,7 +83,7 @@ router.post('/', async (req, res) => {
         // Handle the action for this payload
         return res.sendStatus(200);
       } else if (payload === 'tuto') {
-        const postUrl = "Cliquez sur ce lien pour accéder au tutoriel : https://www.facebook.com/yourpage/posts/1234567890"; 
+        const postUrl = "Cliquez sur ce lien pour accéder au tutoriel : https://fb.watch/rIsweu7vLZ/"; 
         // Send the post URL as a message to the user
         await sendMessage(fbid, postUrl);
         
