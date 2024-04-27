@@ -175,8 +175,8 @@ async function yesNo(fbid) {
     tester notre bot ? 🌟🔓  \n 
     Pour l\'activer, appuyez sur (oui)👇 `;
     const quickReplies = [
-     { content_type: 'text', title: 'Tuto ', payload: 'tuto' },
-     { content_type: 'text', title: 'Oui 🆓', payload: 'oui' }
+    { content_type: 'text', title: 'Oui ✔️ ', payload: 'oui' },
+     { content_type: 'text', title: 'Tuto 📚', payload: 'tuto' }
      //{ content_type: 'text', title: 'Notre Service', payload: 'service' }    
     ];
     await sendQuickReplyMessage(fbid, messageText, quickReplies);
