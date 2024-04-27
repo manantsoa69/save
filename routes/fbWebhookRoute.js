@@ -78,8 +78,15 @@ router.post('/', async (req, res) => {
         await saveSubscription(fbid);
         // Handle the action for this payload
         return res.sendStatus(200);
-      } else if (payload === 'gratuit') {
+      } else if (payload === 'service') { 
         await saveSubscription(fbid);
+        // Handle the action for this payload
+        return res.sendStatus(200);
+      } else if (payload === 'tuto') {
+        const postUrl = "Cliquez sur ce lien pour accéder au tutoriel : https://www.facebook.com/yourpage/posts/1234567890"; 
+        // Send the post URL as a message to the user
+        await sendMessage(fbid, postUrl);
+        
         // Handle the action for this payload
         return res.sendStatus(200);
       } else {
@@ -119,9 +126,7 @@ router.post('/', async (req, res) => {
         result = await func(chathistory, query, 'Chat');
         if (result) break;
       }
-      if (result && typeof result === 'object' && result.content) {
-        result = result.content;
-      }
+      
       await Promise.all([
         saveChatHistory(fbid, query, result),
         sendMessage(fbid, result),
@@ -167,9 +172,7 @@ router.post('/', async (req, res) => {
         result = await func(chathistory, query, 'Live');
         if (result) break;
       }
-      if (result && typeof result === 'object' && result.content) {
-        result = result.content;
-      }
+      
       await Promise.all([
         saveChatHistory(fbid, query, result),
         sendMessage(fbid, result),
