@@ -13,10 +13,10 @@
   💰 Prix : 2 000 Ariary 
   🏧 Moyens de paiement acceptés :
   Artel Money:
-  033 57 446 80      (👤 Jean Marc.)
+  033 57 446 80 (👤 Jean Marc.)
   📲 Une fois le paiement effectué, veuillez nous fournir votre numéro (10 chiffres) pour la vérification.
   (Aza asina espace na soratra fa tonga dia ny numéro ihany)`;
-  const msgE =`📢 Votre abonnement a expiré. 😢 Pour continuer à bénéficier des services de notre chatbot, nous vous encourageons à renouveler votre abonnement dès maintenant. L'abonnement est disponible à partir de 2500 Ariary seulement. Si vous avez besoin de plus de détails, n'hésitez pas à nous le demander ! 💬` 
+  const msgE =`📢 Votre abonnement a expiré. 😢 Pour continuer à bénéficier des services de notre chatbot, nous vous encourageons à renouveler votre abonnement dès maintenant. L'abonnement est disponible à partir de 2 000 Ariary seulement. Si vous avez besoin de plus de détails, n'hésitez pas à nous le demander ! 💬` ;
   const welcomeMsg = `Bienvenue ! 🌟 Nous sommes ravis de vous accueillir ! N'hésitez pas à explorer nos services et à poser vos questions. Nous sommes là pour vous aider. 🚀`;
   const check = async (fbid) => {
     try {
@@ -32,7 +32,7 @@
         }
       }
       console.log('Cache not found or incomplete');
-      return { access: 'Incomplete', chatHistory: null };
+      return { access: 'E', chatHistory: null };
     } catch (error) {
       console.error('Error occurred while checking:', error);
       throw error; // Rethrow the error to handle it elsewhere
@@ -48,10 +48,10 @@
         if (cacheItem0 === 'E') {
           await sendMessage(fbid, expired);
           console.log('Expired.');
-          return {};
+          return {Status: 'E'};
         } else if (cacheItem0 === 'Chat') {
           console.log('Status is ChatC');
-          return { Status: 'C', chathistory: cacheItem1 }; // Corrected typo chathistory -> chatHistory
+          return { Status: 'C', chathistory: cacheItem1 }; 
         } else if (cacheItem0 === 'Trad') {
           console.log('Status is T.');
           return { Status: 'T' };
@@ -61,11 +61,12 @@
         } else if (cacheItem0 === 'Live') {
           console.log('Status is L.');
           return { Status: 'L' };
-        }
+        } else{ 
+          return { Status: 'E' };
+        } 
       }
       const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_API_KEY);
       const { data, error } = await supabase.from('chat_responses').select('*').eq('fbid', fbid);
-
           if (error) {
             console.error('Error:', error.message);
             return { status: 'Error', message: error.message };
@@ -77,15 +78,15 @@
             const cacheKey = `${fbid}`;
             await redis.multi()
               .rpush(`${cacheKey}`, `E`)
-              .rpush(`${cacheKey}`, 1, '  ')
+              .rpush(`${cacheKey}`, ``)
               .exec();// Assuming redis is defined and initialized elsewhere
             await sendMessage(fbid, msgE);
             console.log(data[0]);
-            return 1 ;
+            return { Status: 'EE' };
           } else {
             console.log(`No data found in table chat_responses with fbid '${fbid}'`);
             await Promise.all([
-                //sendMessage(fbid, welcomeMsg),
+               // sendMessage(fbid, welcomeMsg),
                 yesNo(fbid),
               ]);
             return 1;
