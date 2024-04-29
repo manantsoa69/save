@@ -50,11 +50,7 @@ const googlechat1 = async (chathistory, query, param) => {
     const model = genAI.getGenerativeModel({ model: "gemini-pro", generationConfig, safetySettings });
     console.log(`GOOGLE1 `);
     const prompt = await generatePrompt  (chathistory, query, param);
-
-    
     const result = await model.generateContent(prompt);
-    
-
     const response = await result.response;
     const content = response.text().trim();
     if (!content) {
@@ -76,7 +72,7 @@ const handleFallback = async (prompt) => {
   try {
     const result = await askHercai(prompt);
     console.log("Using OpenAI's chatCompletion");
-    return { content: result };
+    return  result ;
   } catch (openaiError) {
     console.error('Error occurred during chatCompletion fallback:', openaiError);
     await sendMessage(fbid,"Je suis un peu confus. Veuillez reposer votre question, s'il vous plaît.");

@@ -1,12 +1,11 @@
-const { DuckDuckGoSearch } = require("@langchain/community/tools/duckduckgo_search");
-const tool = new DuckDuckGoSearch({ maxResults: 1 });
 
+const { generateResponse } = require('../helper/sendPost');
 async function generatePrompt(chathistory, query, param) {
   let prompt;
   switch (param) {
     case 'Chat':
       prompt = `You are a helpful AI engaging in a conversation with
-a Human. Your responses are not overly lengthy but are packed with valuable insights.
+a human. Your responses are not overly lengthy but are packed with valuable insights.
 Your powerful capabilities enable you to answer all questions effectively.
 
 Previous conversation:
@@ -29,15 +28,15 @@ AI Response:`;
     case 'Live':
       try {
         
-        const liveResult = await tool.invoke(query);      
-        const parsedResult = JSON.parse(liveResult)[0];
-        const snippet = parsedResult.snippet;
+        const liveResult = await generateResponse(query); 
+       
         prompt = `Ajust the context from internet to answer the question correctly
-        condensing the key points into 2-5 sentences.you use the language of the question
-        context from internet:
-        ${snippet}
+        condensing the key points into 2-6 sentences use only the date on the context.
+        context:
+        ${liveResult}
         question:
         ${query}
+        
         `;
         return prompt;
       } catch (error) {
